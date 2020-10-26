@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-foo',
@@ -7,16 +8,20 @@ import { HttpClient } from '@angular/common/http';
 })
 export class FooComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private authService: AuthService) {
   }
 
   msg: string = '';
+  yourRole: string;
 
   ngOnInit(): void {
-    this.httpClient.get('http://localhost:8080/foo',
-      {withCredentials: true, responseType: 'text'}).subscribe(value => {
-      this.msg = value;
-    })
-  }
+    const bearerHeader =
+      new HttpHeaders().append('Authorization', 'Bearer ' + this.authService.jwtToken);
 
+    this.httpClient.get('http://localhost:8080/foo', {responseType: 'text', headers: bearerHeader})
+      .subscribe(value => {
+        this.msg = value;
+        this.yourRole = this.authService.getRole();
+      })
+  }
 }

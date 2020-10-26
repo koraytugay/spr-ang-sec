@@ -13,13 +13,14 @@
 - Navigate to `localhost:4200`
   - Validate you cannot navigate to either `foo` or `bar`
   - You will need to login, use credentials `john:doe`
+  - You can alternatively use `a:a`
+  - Validate you can navigate to either `foo` or `bar`
 
 ## What This Is
 This is a sample Angular - Spring Boot application with a focus on authentication. 
-There are many improvements that can be done. The purpose of this project is to show how base64 
-encoded basic authentication headers can be passed from angular to backend, and how the JSESSIONID
-can consequently be used. 
+There are many improvements that can be done. It can be used to study / investigate how
+basic authentication (passing `JESSIONCOOKIE` between the client and the server) and how JWTs can be used.
+See branch `http-basic` for how Basic authentication can be implemented. See branch `jwt` for the
+first iteration of the `jwt` implementation, which stores the JWT token in-memory in front-end. 
 
-When user sends username and password in login form in Angular, they are sent via HTTP Basic 
-Authentication to Spring Security. If authentication is successful, consequent requests include the
-JSESSIONID, from which Spring Security can fetch the user.
+Reference for this work is [Angular Security and Deployment](https://www.manning.com/livevideo/angular-for-java-developers-security-and-deployment).

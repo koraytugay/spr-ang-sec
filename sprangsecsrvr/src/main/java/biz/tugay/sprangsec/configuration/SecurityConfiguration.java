@@ -1,5 +1,6 @@
 package biz.tugay.sprangsec.configuration;
 
+import biz.tugay.sprangsec.filter.JwtFilter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,7 +18,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .inMemoryAuthentication()
         .withUser("john")
         .password("{noop}doe")
-        .authorities("ROLE_USER");
+        .authorities("ROLE_USER")
+        .and()
+        .withUser("a")
+        .password("{noop}a")
+        .authorities("ROLE_ADMIN");
   }
 
   @Override
@@ -27,8 +32,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // This is needed since Angular first sends an OPTIONS request to /validate endpoint
         // without any authorization information with the request.
         .antMatchers(HttpMethod.OPTIONS).permitAll()
-        .antMatchers("/validate", "/foo", "/bar").hasRole("USER")
+        .antMatchers("/validate", "/foo", "/bar").hasAnyRole("USER", "ADMIN")
         .and()
-        .httpBasic();
+        .httpBasic()
+        .and()
+        .addFilter(new JwtFilter(authenticationManager()));
   }
 }

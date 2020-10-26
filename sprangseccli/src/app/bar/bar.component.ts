@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-bar',
@@ -7,13 +8,16 @@ import { HttpClient } from '@angular/common/http';
 })
 export class BarComponent implements OnInit {
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private authService: AuthService) {
   }
 
   msg: string = '';
 
   ngOnInit(): void {
-    this.httpClient.get('http://localhost:8080/bar', {withCredentials: true, responseType: 'text'})
+    const bearerHeader =
+      new HttpHeaders().append('Authorization', 'Bearer ' + this.authService.jwtToken);
+
+    this.httpClient.get('http://localhost:8080/bar', {responseType: 'text', headers: bearerHeader})
       .subscribe(value => {
         this.msg = value;
       })

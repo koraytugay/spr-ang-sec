@@ -10,10 +10,10 @@ export class DataService {
   constructor(private http: HttpClient) {
   }
 
-  validateUser(username: string, password: string): Observable<void> {
+  validateUser(username: string, password: string): Observable<{jwtToken:string}> {
     const authData = btoa(`${username}:${password}`);  // binary to ascii - encodes input in base64
     const headers = new HttpHeaders().append('Authorization', 'Basic ' + authData);
-    return this.http.get<void>('http://localhost:8080/validate',
+    return this.http.get<{jwtToken:string}>('http://localhost:8080/validate',
       {headers: headers, withCredentials: true});
   }
 }
