@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.router.navigateByUrl('/');
       return;
     }
+    this.authService.validateSession();
     this.subscription = this.authService.authenticationResultEvent.subscribe(
       result => {
         if (result) {
@@ -38,7 +39,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   onSubmit() {

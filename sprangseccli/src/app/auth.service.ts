@@ -23,4 +23,13 @@ export class AuthService {
         this.authenticationResultEvent.emit(false);
       });
   }
+
+  validateSession() {
+    this.dataService.validateUserSession().subscribe(() => {
+      this.isAuthenticated = true;
+      this.authenticationResultEvent.emit(true);
+    }, () => {
+      this.isAuthenticated = false;
+    })
+  }
 }

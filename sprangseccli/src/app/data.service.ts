@@ -12,8 +12,15 @@ export class DataService {
 
   validateUser(username: string, password: string): Observable<void> {
     const authData = btoa(`${username}:${password}`);  // binary to ascii - encodes input in base64
-    const headers = new HttpHeaders().append('Authorization', 'Basic ' + authData);
+    let headers = new HttpHeaders().append('Authorization', 'Basic ' + authData);
+    headers = headers.append("X-Requested-With", "XMLHttpRequest");
     return this.http.get<void>('http://localhost:8080/validate',
       {headers: headers, withCredentials: true});
+  }
+
+  validateUserSession(): Observable<void> {
+    let headers = new HttpHeaders();
+    headers = headers.append("X-Requested-With", "XMLHttpRequest");
+    return this.http.get<void>('http://localhost:8080/validate', {headers: headers, withCredentials: true});
   }
 }
