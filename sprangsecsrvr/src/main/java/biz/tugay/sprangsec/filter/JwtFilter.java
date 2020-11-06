@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.boot.json.JsonParser;
@@ -33,8 +34,21 @@ public class JwtFilter extends BasicAuthenticationFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws IOException, ServletException {
 
-    String bearerHeader = request.getHeader("Authorization");
-    if (bearerHeader == null || !bearerHeader.startsWith("Bearer")) {
+    Cookie[] cookies = request.getCookies();
+    Cookie jwtToken = null;
+
+    if (cookies == null) {
+      chain.doFilter(request, response);
+      return;
+    }
+
+    for (Cookie cookie : cookies) {
+      if ("jwtToken".equals(cookie.getName())) {
+        jwtToken = cookie;
+      }
+    }
+
+    if (jwtToken == null) {
       chain.doFilter(request, response);
       return;
     }
@@ -46,15 +60,20 @@ public class JwtFilter extends BasicAuthenticationFilter {
       jwtService = webApplicationContext.getBean(JwtService.class);
     }
 
-    Authentication usernamePasswordAuthenticationToken = getAuthentication(bearerHeader);
+    Authentication usernamePasswordAuthenticationToken = getAuthentication(jwtToken.getValue());
+
+    if (usernamePasswordAuthenticationToken == null) {
+      jwtToken.setMaxAge(0);
+      jwtToken.setHttpOnly(true);
+      response.addCookie(jwtToken);
+    }
     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
     chain.doFilter(request, response);
   }
 
-  private UsernamePasswordAuthenticationToken getAuthentication(String header) {
+  private UsernamePasswordAuthenticationToken getAuthentication(String jwtToken) {
     try {
-      String jwtToken = header.substring(7); // We are interested in value after `Bearer `
       String payload = jwtService.validateToken(jwtToken);
 
       JsonParser jsonParser = JsonParserFactory.getJsonParser();

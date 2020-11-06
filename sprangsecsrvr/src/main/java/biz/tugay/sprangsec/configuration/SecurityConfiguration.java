@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // This is needed since Angular first sends an OPTIONS request to /validate endpoint
         // without any authorization information with the request.
         .antMatchers(HttpMethod.OPTIONS).permitAll()
-        .antMatchers("/validate", "/foo", "/bar").hasAnyRole("USER", "ADMIN")
+        .antMatchers("/validate", "/foo", "/bar", "/role").hasAnyRole("USER", "ADMIN")
         .and()
         .httpBasic()
         .and()

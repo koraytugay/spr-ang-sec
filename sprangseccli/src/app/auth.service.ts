@@ -8,17 +8,19 @@ export class AuthService {
 
   isAuthenticated: boolean = false;
   authenticationResultEvent = new EventEmitter<boolean>();
-  jwtToken: string;
+  role: string;
 
   constructor(private dataService: DataService) {
   }
 
   authenticate(username: string, password: string) {
     this.dataService.validateUser(username, password).subscribe(
-      (payload) => {
-        this.jwtToken = payload.jwtToken;
+      () => {
         this.isAuthenticated = true;
         this.authenticationResultEvent.emit(true);
+        this.dataService.getRole().subscribe(response => {
+          this.role = response.role;
+        });
       }, (error) => {
         console.log(error);
         this.isAuthenticated = false;
@@ -27,10 +29,19 @@ export class AuthService {
   }
 
   getRole(): string {
-    if (this.jwtToken != null) {
-      const encodedPayload = this.jwtToken.split('.')[1];
-      const payload = atob(encodedPayload);
-      return JSON.parse(payload).role;
+    if (this.isAuthenticated != null) {
+      return this.role;
     }
+    return null;
+  }
+
+  isUserAuthenticated() {
+    this.dataService.getRole().subscribe(response => {
+      this.isAuthenticated = true;
+      this.role = response.role;
+      this.authenticationResultEvent.emit(true);
+    }, () => {
+      // swallow
+    });
   }
 }

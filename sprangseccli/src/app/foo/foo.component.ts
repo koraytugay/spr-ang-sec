@@ -15,10 +15,10 @@ export class FooComponent implements OnInit {
   yourRole: string;
 
   ngOnInit(): void {
-    const bearerHeader =
-      new HttpHeaders().append('Authorization', 'Bearer ' + this.authService.jwtToken);
-
-    this.httpClient.get('http://localhost:8080/foo', {responseType: 'text', headers: bearerHeader})
+    let headers = new HttpHeaders();
+    headers = headers.append("X-Requested-With", "XMLHttpRequest");
+    this.httpClient.get('http://localhost:8080/foo',
+      {responseType: 'text', withCredentials: true, headers: headers})
       .subscribe(value => {
         this.msg = value;
         this.yourRole = this.authService.getRole();

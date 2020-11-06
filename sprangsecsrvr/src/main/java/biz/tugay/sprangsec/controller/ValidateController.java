@@ -3,6 +3,8 @@ package biz.tugay.sprangsec.controller;
 import biz.tugay.sprangsec.service.JwtService;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +29,9 @@ public class ValidateController {
     this.jwtService = jwtService;
   }
 
-  // Endpoint to be used by front end client.
-  // This endpoint returns the generated jwtToken in json {jwtToken: ''} if the basic authentication
-  // is successful.
+  // TODO
   @GetMapping
-  public Map<String, String> isUserValid() {
+  public void isUserValid(HttpServletResponse httpServletResponse) {
     SecurityContext securityContext = SecurityContextHolder.getContext();
     Authentication authentication = securityContext.getAuthentication();
     User principal = (User) authentication.getPrincipal();
@@ -40,9 +40,10 @@ public class ValidateController {
     // We work with single role per user, chop off ROLE_ part by substring
     String principalRole = principal.getAuthorities().iterator().next().toString().substring(5);
 
-    Map<String, String> jwtTokenJson = new HashMap<>();
-    jwtTokenJson.put("jwtToken", jwtService.generateToken(principalUsername, principalRole));
+    Cookie jwtToken =
+        new Cookie("jwtToken", jwtService.generateToken(principalUsername, principalRole));
+    jwtToken.setHttpOnly(true);
 
-    return jwtTokenJson;
+    httpServletResponse.addCookie(jwtToken);
   }
 }
