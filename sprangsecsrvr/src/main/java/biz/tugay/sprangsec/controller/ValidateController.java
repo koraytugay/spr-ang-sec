@@ -29,7 +29,6 @@ public class ValidateController {
     this.jwtService = jwtService;
   }
 
-  // TODO
   @GetMapping
   public void isUserValid(HttpServletResponse httpServletResponse) {
     SecurityContext securityContext = SecurityContextHolder.getContext();
