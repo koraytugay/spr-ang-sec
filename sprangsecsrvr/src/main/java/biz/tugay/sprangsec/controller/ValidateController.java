@@ -1,8 +1,6 @@
 package biz.tugay.sprangsec.controller;
 
 import biz.tugay.sprangsec.service.JwtService;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
